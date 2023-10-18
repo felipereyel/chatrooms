@@ -1,7 +1,9 @@
 package server
 
 import (
+	"chatrooms/gosrc/cmd/migrate"
 	"chatrooms/gosrc/config"
+	"chatrooms/gosrc/routes"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -9,11 +11,16 @@ import (
 )
 
 func Start(cmd *cobra.Command, args []string) {
-	app := fiber.New(fiber.Config{})
-	app.Use(cors.New())
+	if config.Configs.AutoMigrate {
+		migrate.Up(cmd, args)
+	}
 
-	app.Static("/", config.Configs.PublicDir)
-	app.Static("*", config.Configs.PublicDir+"/index.html")
+	app := fiber.New(fiber.Config{
+		ErrorHandler: routes.ErrorHandler,
+	})
+
+	app.Use(cors.New())
+	routes.Init(app)
 
 	if err := app.Listen(config.Configs.ServerAddress); err != nil {
 		panic(err.Error())

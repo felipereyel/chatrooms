@@ -37,11 +37,9 @@ func saveAuth(c *fiber.Ctx) error {
 	}
 
 	c.Cookie(&fiber.Cookie{
-		Name:     cookieName,
-		Value:    jwt,
-		Expires:  exp,
-		HTTPOnly: true,
-		SameSite: "strict",
+		Name:    cookieName,
+		Value:   jwt,
+		Expires: exp,
 	})
 
 	return c.SendStatus(fiber.StatusOK)

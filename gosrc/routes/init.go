@@ -14,9 +14,14 @@ func Init(app *fiber.App) error {
 		return fmt.Errorf("[Init] failed to get database: %w", err)
 	}
 
+	apiGroup := app.Group("/_api")
+	apiGroup.Get("/t", verifyAuth, func(c *fiber.Ctx) error {
+		return c.SendString("ok")
+	})
+
 	uc := controllers.NewUserController(database)
-	authApp := app.Group("/_auth")
-	initAuthRoutes(authApp, uc)
+	authGroup := apiGroup.Group("/users")
+	initUsersRoutes(authGroup, uc)
 
 	initStaticRoutes(app)
 	return nil

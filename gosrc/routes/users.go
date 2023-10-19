@@ -6,17 +6,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func initAuthRoutes(app fiber.Router, tc *controllers.UserController) {
-	app.Get("/test", verifyAuth, testAuth)
-	app.Post("/login", authLogin(tc), saveAuth)
-	app.Post("/register", authRegister(tc), saveAuth)
+func initUsersRoutes(gp fiber.Router, tc *controllers.UserController) {
+	gp.Post("/login", userLogin(tc), saveAuth)
+	gp.Post("/register", userRegister(tc), saveAuth)
 }
 
-func testAuth(c *fiber.Ctx) error {
-	return c.SendString("authed")
-}
-
-func authLogin(tc *controllers.UserController) fiber.Handler {
+func userLogin(tc *controllers.UserController) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var req controllers.UserRequest
 		err := c.BodyParser(&req)
@@ -36,7 +31,7 @@ func authLogin(tc *controllers.UserController) fiber.Handler {
 	}
 }
 
-func authRegister(tc *controllers.UserController) fiber.Handler {
+func userRegister(tc *controllers.UserController) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var req controllers.UserRequest
 		err := c.BodyParser(&req)

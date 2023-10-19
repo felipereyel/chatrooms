@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { isloggedin } from "./auth";
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -9,14 +10,15 @@ export const router = createRouter({
       component: () => import("./views/Home.vue"),
       meta: {
         title: "Home",
+        auth: true,
       }
     },
     {
-      name: "login",
-      path: "/login",
-      component: () => import("./views/Login.vue"),
+      name: "auth",
+      path: "/auth",
+      component: () => import("./views/Auth.vue"),
       meta: {
-        title: "Login",
+        title: "Auth",
       }
     },
     {
@@ -25,7 +27,17 @@ export const router = createRouter({
       component: () => import("./views/Chatroom.vue"),
       meta: {
         title: "Room",
+        auth: true,
       }
     },
   ],
+});
+
+
+router.beforeEach(async (to, from) => {
+  if (to.meta.auth && !isloggedin()) {
+    // TODO: redirect to login with redirect back to current route
+    await router.push({ name: 'auth' });
+    return;
+  }
 });

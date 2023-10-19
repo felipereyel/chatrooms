@@ -38,6 +38,7 @@ func (db *database) UserLogin(username string, password string) (models.User, er
 		return models.User{}, err
 	}
 
+	// slow checking -> design feature of bcrypt
 	if !utils.CheckPasswordHash(password, user.Pass) {
 		return models.User{}, errors.New("bad username or password")
 	}

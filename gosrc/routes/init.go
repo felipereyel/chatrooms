@@ -15,13 +15,18 @@ func Init(app *fiber.App) error {
 	}
 
 	apiGroup := app.Group("/_api")
-	apiGroup.Get("/t", verifyAuth, func(c *fiber.Ctx) error {
-		return c.SendString("ok")
-	})
 
 	uc := controllers.NewUserController(database)
-	authGroup := apiGroup.Group("/users")
-	initUsersRoutes(authGroup, uc)
+	usersGroup := apiGroup.Group("/users")
+	initUsersRoutes(usersGroup, uc)
+
+	rc := controllers.NewRoomController(database)
+	roomsGroup := apiGroup.Group("/rooms")
+	initRoomsRoutes(roomsGroup, rc)
+
+	pc := controllers.NewPostsController(database)
+	postsGroup := apiGroup.Group("/rooms")
+	initPostsRoutes(postsGroup, pc)
 
 	initStaticRoutes(app)
 	return nil

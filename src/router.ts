@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { isloggedin } from "./auth";
+import { isloggedin } from "./api";
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -22,8 +22,17 @@ export const router = createRouter({
       }
     },
     {
+      name: "new-room",
+      path: "/new-room",
+      component: () => import("./views/NewRoom.vue"),
+      meta: {
+        title: "New Room",
+        auth: true,
+      }
+    },
+    {
       name: "room",
-      path: "/room/:name",
+      path: "/room/:id",
       component: () => import("./views/Chatroom.vue"),
       meta: {
         title: "Room",

@@ -15,7 +15,7 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 import { useRouter } from 'vue-router';
-import { apilogin, apiregister } from '../auth';
+import { apilogin, apiregister } from '../api';
 
 const router = useRouter();
 
@@ -60,3 +60,4 @@ const register = async () => {
 </script>
 
 <style scoped></style>
+../api

@@ -4,7 +4,7 @@
     <h1 class="text-3xl">&#20; > {{ state.roomName }}</h1>
   </div>
   <div class="flex-1 flex flex-col overflow-y-auto space-y-2 p-8">
-    <div class="flex-1 overflow-y-auto space-y-2">
+    <div class="flex-1 overflow-y-auto space-y-2" id="msg-container">
       <div v-for="message in posts" :key="message.id" class="flex items-center bg-slate-600 rounded-md px-2 justify-between">
         <span>
           {{ message.content }}
@@ -20,13 +20,12 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive } from 'vue';
+import { nextTick, onMounted, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { getroom, listposts, createpost } from '../api';
+import { getroom, listposts, createpost, getRoomWs } from '../api';
 
 const route = useRoute();
 const router = useRouter();
-
 const roomId = route.params.id as string;
 
 type Posts = {
@@ -50,12 +49,27 @@ const formatCreatedAt = (datestr: string) => {
 
 onMounted(async () => {
   try {
+    const elem = document.getElementById('msg-container')!;
     const [room, lposts] = await Promise.all([getroom(roomId), listposts(roomId)]);
     state.roomName = room.name;
     posts.push(...lposts.reverse());
+    elem.scrollTop = elem.scrollHeight;
+
+    const ws = getRoomWs(roomId);
+    ws.addEventListener('message', (event) => {
+      posts.push(JSON.parse(event.data));
+      if (posts.length > 50) {
+        posts.shift();
+      }
+
+      nextTick(() => {
+        elem.scrollTop = elem.scrollHeight;
+      });
+    });
+
   } catch (e) {
     console.log(e);
-    router.push('/');
+    // router.push('/');
   }
 });
 

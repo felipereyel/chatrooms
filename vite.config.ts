@@ -11,6 +11,10 @@ export default defineConfig({
       '/_api': {
         target: `http://0.0.0.0:${DEV_API_PORT}`,
       },
+      '^/_api/rooms/.*/ws': {
+        target: `ws://0.0.0.0:${DEV_API_PORT}`,
+        ws: true,
+      }
     }
   }
 });

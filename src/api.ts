@@ -109,3 +109,7 @@ const _initRoom = async (roomid: string) => {
         await createpost(roomid, post.content)
     }
 }
+
+export const getRoomWs = (roomid: string) => {
+    return new WebSocket(`ws://${window.location.host}/_api/rooms/${roomid}/ws`);
+}

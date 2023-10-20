@@ -2,6 +2,7 @@ package routes
 
 import (
 	"chatrooms/gosrc/controllers"
+	"chatrooms/gosrc/repositories/broker"
 	"chatrooms/gosrc/repositories/database"
 	"fmt"
 
@@ -14,6 +15,11 @@ func Init(app *fiber.App) error {
 		return fmt.Errorf("[Init] failed to get database: %w", err)
 	}
 
+	broker, err := broker.NewBrokerRepo()
+	if err != nil {
+		return fmt.Errorf("[Init] failed to get broker: %w", err)
+	}
+
 	apiGroup := app.Group("/_api")
 
 	uc := controllers.NewUserController(database)
@@ -24,7 +30,7 @@ func Init(app *fiber.App) error {
 	roomsGroup := apiGroup.Group("/rooms")
 	initRoomsRoutes(roomsGroup, rc)
 
-	pc := controllers.NewPostsController(database)
+	pc := controllers.NewPostsController(database, broker)
 	postsGroup := apiGroup.Group("/rooms")
 	initPostsRoutes(postsGroup, pc)
 

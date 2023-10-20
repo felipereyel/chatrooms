@@ -63,13 +63,7 @@ const sendMessage = async () => {
   const { message } = state;
   if (!message) return;
 
-  const post = await createpost(route.params.id as string, message);
-  console.log(post);
-  posts.push(post);
-  if (posts.length > 50) {
-    posts.shift();
-  }
-
+  await createpost(route.params.id as string, message);
   state.message = '';
 };
 </script>

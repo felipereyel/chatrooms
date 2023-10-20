@@ -25,13 +25,12 @@ func postPosts(pc *controllers.PostsController) fiber.Handler {
 		roomId := c.Params("roomId")
 		userId := c.Locals("id").(string)
 
-		post, err := pc.CreatePost(userId, roomId, body.Content)
-		if err != nil {
+		if err := pc.CreatePost(userId, roomId, body.Content); err != nil {
 			// TODO handle bad request
 			return err
 		}
 
-		return c.JSON(post)
+		return c.SendStatus(fiber.StatusCreated)
 	}
 }
 

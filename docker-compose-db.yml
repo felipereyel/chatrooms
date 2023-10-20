@@ -11,6 +11,17 @@ services:
       POSTGRES_PASSWORD: chatrooms
     volumes:
       - local_pgdata:/var/lib/postgresql/data
+  rabbitmq:
+    image: 'rabbitmq:management'
+    ports:
+      - "56720:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: chatrooms
+      RABBITMQ_DEFAULT_PASS: chatrooms
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq 
 
 volumes:
   local_pgdata:
+  rabbitmq_data:

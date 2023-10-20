@@ -77,7 +77,7 @@ export const createroom = async (name: string) => {
 };
 
 export const listposts = async (roomid: string) => {
-    const r = await fetch(`/_api/rooms/${roomid}/posts/`)
+    const r = await fetch(`/_api/rooms/${roomid}/posts`)
 
     if (!r.ok) {
         throw new Error(await r.text())
@@ -98,8 +98,6 @@ export const createpost = async (roomid: string, content: string) => {
     if (!r.ok) {
         throw new Error(await r.text())
     }
-
-    return await r.json()
 };
 
 const _initRoom = async (roomid: string) => {

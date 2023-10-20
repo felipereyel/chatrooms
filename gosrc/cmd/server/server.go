@@ -16,7 +16,8 @@ func Start(cmd *cobra.Command, args []string) {
 	}
 
 	app := fiber.New(fiber.Config{
-		ErrorHandler: routes.ErrorHandler,
+		ErrorHandler:  routes.ErrorHandler,
+		StrictRouting: true,
 	})
 
 	app.Use(cors.New())

@@ -9,6 +9,7 @@ import (
 type tconfigs struct {
 	PublicDir          string
 	ServerAddress      string
+	RabbitMQConnString string
 	DatabaseConnString string
 	AutoMigrate        bool
 	MigrationsDir      string
@@ -37,6 +38,13 @@ func init() {
 		Configs.DatabaseConnString = envDatabaseConnString
 	} else {
 		panic("DATABASE_CONN_STRING is not set")
+	}
+
+	envRabbitMQConnString := os.Getenv("RABBITMQ_CONN_STRING")
+	if envRabbitMQConnString != "" {
+		Configs.RabbitMQConnString = envRabbitMQConnString
+	} else {
+		panic("RABBITMQ_CONN_STRING is not set")
 	}
 
 	envJWTSecret := os.Getenv("JWT_SECRET")

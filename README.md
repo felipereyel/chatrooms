@@ -33,10 +33,10 @@ This application was developed with scaling of its individual components in mind
 
 ## Testing
 
-Tests were written for the controllers. Run them with:
+Tests were written for the controllers, utils and modes. Run them with:
 
 ```sh
-  go test ./gosrc/controllers -v
+  go test ./... -v
 ```
 
 Note that the tests for the user controller take about 4 seconds.   

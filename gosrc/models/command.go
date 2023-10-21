@@ -12,14 +12,16 @@ type CommandView struct {
 }
 
 func IsCommand(message string) bool {
-	return message[0] == '/'
+	return message != "" && message[0] == '/'
 }
+
+var ErrInvalidCommand = errors.New("invalid command")
 
 func (c *CommandView) GetStockCode() (string, error) {
 	regex := regexp.MustCompile(`^\/stock=([a-zA-Z0-9.]+)$`)
 	matches := regex.FindStringSubmatch(c.Payload)
 	if len(matches) != 2 {
-		return "", errors.New("invalid command")
+		return "", ErrInvalidCommand
 	}
 
 	return matches[1], nil

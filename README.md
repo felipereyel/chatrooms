@@ -9,10 +9,10 @@ Use docker compose to run all required services:
 ```
 
 The application should be runnig of port 3000 after initialization (fiber header will appear).   
-
-Note that this project uses `cookies` for authentication, so to simulate multiple users you can:    
+There are some screenshots on the `screenshots` folder capturing the most important flows.      
+Note that this project uses `jwt cookies` for authentication, so to simulate multiple users you can:    
 - open multiple different browsers 
-- combine the use of private/icognito windows with normal windows
+- combine the use of private/icognito windows with normal windows, [example](./screenshots//live-chat.gif)
 
 ## Contents
 This command will run the following containers:

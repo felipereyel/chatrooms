@@ -7,8 +7,9 @@ import (
 
 func TestJWT(t *testing.T) {
 	id := "123"
+	user := "test"
 
-	token, expiration, err := GenerateJWT(id)
+	token, expiration, err := GenerateJWT(id, user)
 	if err != nil {
 		t.Fatalf("Error generating JWT: %v", err)
 	}

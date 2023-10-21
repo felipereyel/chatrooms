@@ -1,0 +1,72 @@
+version: "3.8"
+services:
+  db:
+    image: postgres:13.10
+    restart: always
+    ports:
+      - "54320:5432"
+    environment:
+      POSTGRES_DB: chatrooms
+      POSTGRES_USER: chatrooms
+      POSTGRES_PASSWORD: chatrooms
+    volumes:
+      - local_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "chatrooms"]
+      interval: 10s
+      timeout: 30s
+      retries: 3
+
+  rabbitmq:
+    image: 'rabbitmq:management'
+    ports:
+      - "56720:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: chatrooms
+      RABBITMQ_DEFAULT_PASS: chatrooms
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq 
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 30s
+      retries: 3
+
+  chatrooms:
+    build: .
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_CONN_STRING: postgres://chatrooms:chatrooms@db:5432/chatrooms?sslmode=disable
+      RABBITMQ_CONN_STRING: amqp://chatrooms:chatrooms@rabbitmq:5672/
+      PUBLIC_DIR: /dist
+      PORT: 3000
+    env_file:
+      - .env.example
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  bot:
+    build: .
+    command: [/goapp, bot]
+    restart: always
+    environment:
+      DATABASE_CONN_STRING: postgres://chatrooms:chatrooms@db:5432/chatrooms?sslmode=disable
+      RABBITMQ_CONN_STRING: amqp://chatrooms:chatrooms@rabbitmq:5672/
+    env_file:
+      - .env.example
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    
+
+volumes:
+  local_pgdata:
+  rabbitmq_data:

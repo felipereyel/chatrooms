@@ -58,25 +58,36 @@ func (bc *BotController) ListenAndAnswerCommands() error {
 		body := msg.Body
 		var command models.CommandView
 		if err := json.Unmarshal(body, &command); err != nil {
-			// TODO handle bot errors
+			// TODO handle internal bot errors
 			continue
+		}
+
+		var responseContent string
+
+		if !command.IsValid() {
+			responseContent = "[Error] Invalid command"
+		} else {
+			responseContent, err = command.FetchResponse()
+			if err != nil {
+				responseContent = fmt.Sprintf("[Error] Processing failed: %s", err.Error())
+			}
 		}
 
 		post := models.Post{
 			Id:      uuid.New().String(),
 			UserId:  bc.botId,
 			RoomId:  command.RoomId,
-			Content: fmt.Sprintf("Answer for: %s", command.Payload),
+			Content: responseContent,
 		}
 
 		postview, err := bc.dbRepo.CreatePost(post)
 		if err != nil {
-			// TODO handle bot errors
+			// TODO handle internal bot errors
 			continue
 		}
 
 		if err := bc.brokerRepo.PublishPost(command.RoomId, postview); err != nil {
-			// TODO handle bot errors
+			// TODO handle internal bot errors
 			continue
 		}
 

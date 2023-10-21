@@ -14,6 +14,8 @@ type tconfigs struct {
 	AutoMigrate        bool
 	MigrationsDir      string
 	JWTSecret          string
+	BotUsername        string
+	BotPassword        string
 }
 
 var Configs tconfigs
@@ -52,6 +54,20 @@ func init() {
 		Configs.JWTSecret = envJWTSecret
 	} else {
 		panic("JWT_SECRET is not set")
+	}
+
+	envBotUsername := os.Getenv("BOT_USERNAME")
+	if envBotUsername != "" {
+		Configs.BotUsername = envBotUsername
+	} else {
+		panic("BOT_USERNAME is not set")
+	}
+
+	envBotPassword := os.Getenv("BOT_PASSWORD")
+	if envBotPassword != "" {
+		Configs.BotPassword = envBotPassword
+	} else {
+		panic("BOT_PASSWORD is not set")
 	}
 
 	envAutoMigrate := os.Getenv("AUTO_MIGRATE")

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"chatrooms/gosrc/cmd/bot"
 	"chatrooms/gosrc/cmd/migrate"
 	"chatrooms/gosrc/cmd/server"
 	"chatrooms/gosrc/cmd/tap"
@@ -32,15 +33,22 @@ var migrateDownCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 }
 
+var botCmd = &cobra.Command{
+	Use:   "bot",
+	Short: "Run the bot",
+	Run:   bot.Run,
+}
+
 var tapCmd = &cobra.Command{
 	Use:   "tap",
-	Short: "Tap a room",
+	Short: "Tap a room or all rooms",
 	Run:   tap.Tap,
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.MaximumNArgs(1),
 }
 
 func init() {
 	rootCmd.AddCommand(tapCmd)
+	rootCmd.AddCommand(botCmd)
 	rootCmd.AddCommand(serveCmd)
 	rootCmd.AddCommand(migrateUpCmd)
 	rootCmd.AddCommand(migrateDownCmd)

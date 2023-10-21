@@ -11,5 +11,6 @@ type PostView struct {
 	Id        string `json:"id"`
 	Content   string `json:"content"`
 	Username  string `json:"username"`
+	RoomId    string `json:"room_id"`
 	CreatedAt string `json:"created_at"`
 }

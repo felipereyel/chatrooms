@@ -10,13 +10,18 @@ import (
 )
 
 func Tap(cmd *cobra.Command, args []string) {
-	roomId := args[0]
+	roomId := "*"
+	if len(args) > 0 {
+		roomId = args[0]
+	}
+
 	broker, err := broker.NewBrokerRepo()
 	if err != nil {
 		panic(err.Error())
 	}
+	defer broker.Close()
 
-	subscription, err := broker.Subscribe(roomId)
+	subscription, err := broker.SubscribePosts(roomId)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -30,6 +35,6 @@ func Tap(cmd *cobra.Command, args []string) {
 			continue
 		}
 
-		fmt.Printf("%s: %s\n", post.Username, post.Content)
+		fmt.Printf("[%s] %s: %s\n", post.RoomId, post.Username, post.Content)
 	}
 }

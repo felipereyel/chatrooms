@@ -17,6 +17,16 @@ func NewPostsController(dbRepo database.Database, brokerRepo broker.Broker) *Pos
 	return &PostsController{dbRepo, brokerRepo}
 }
 
+func (pc *PostsController) CreateCommand(roomId, payload string) error {
+	commandView := models.CommandView{
+		Id:      uuid.New().String(),
+		Payload: payload,
+		RoomId:  roomId,
+	}
+
+	return pc.brokerRepo.PublishCommand(commandView)
+}
+
 func (pc *PostsController) ListPosts(roomId string) ([]models.PostView, error) {
 	posts, err := pc.dbRepo.ListPosts(roomId)
 	if err != nil {
@@ -27,6 +37,10 @@ func (pc *PostsController) ListPosts(roomId string) ([]models.PostView, error) {
 }
 
 func (pc *PostsController) CreatePost(userId, roomId, content string) error {
+	if models.IsCommand(content) {
+		return pc.CreateCommand(roomId, content)
+	}
+
 	post := models.Post{
 		Id:      uuid.New().String(),
 		UserId:  userId,
@@ -39,13 +53,13 @@ func (pc *PostsController) CreatePost(userId, roomId, content string) error {
 		return err
 	}
 
-	return pc.brokerRepo.Publish(roomId, postview)
+	return pc.brokerRepo.PublishPost(roomId, postview)
 }
 
 type MessageWriter func(data []byte) error
 
 func (pc *PostsController) SubscribeMessages(roomId string, writer MessageWriter) error {
-	subscription, err := pc.brokerRepo.Subscribe(roomId)
+	subscription, err := pc.brokerRepo.SubscribePosts(roomId)
 	if err != nil {
 		return err
 	}

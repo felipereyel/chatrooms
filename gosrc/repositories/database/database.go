@@ -27,6 +27,20 @@ func (db *database) Close() error {
 	return db.conn.Close()
 }
 
+func (db *database) userGetName(userId string) (string, error) {
+	query := `SELECT username FROM users WHERE id = $1`
+	row := db.conn.QueryRow(query, userId)
+
+	var username string
+	err := row.Scan(&username)
+	if err != nil {
+		// TODO handle not found
+		return "", err
+	}
+
+	return username, nil
+}
+
 func (db *database) UserLogin(username string, password string) (models.User, error) {
 	query := `SELECT id, username, pass FROM users WHERE username = $1`
 	row := db.conn.QueryRow(query, username)
@@ -48,6 +62,17 @@ func (db *database) UserLogin(username string, password string) (models.User, er
 
 func (db *database) UserRegister(user models.User) error {
 	query := `INSERT INTO users (id, username, pass) VALUES ($1, $2, $3)`
+	_, err := db.conn.Exec(query, user.Id, user.Username, user.Pass)
+	if err != nil {
+		// TODO handle conflict
+		return err
+	}
+
+	return nil
+}
+
+func (db *database) UserUpsert(user models.User) error {
+	query := `INSERT INTO users (id, username, pass) VALUES ($1, $2, $3) ON CONFLICT (username) DO UPDATE SET pass = $3`
 	_, err := db.conn.Exec(query, user.Id, user.Username, user.Pass)
 	if err != nil {
 		// TODO handle conflict
@@ -105,7 +130,7 @@ func (db *database) GetRoom(roomId string) (models.Room, error) {
 }
 
 func (db *database) ListPosts(roomId string) ([]models.PostView, error) {
-	query := `SELECT posts.id, posts.content, users.username, posts.created_at FROM posts INNER JOIN users ON posts.user_id = users.id WHERE posts.room_id = $1 ORDER BY posts.created_at DESC LIMIT 50`
+	query := `SELECT posts.id, posts.content, users.username, posts.created_at, posts.room_id FROM posts INNER JOIN users ON posts.user_id = users.id WHERE posts.room_id = $1 ORDER BY posts.created_at DESC LIMIT 50`
 	rows, err := db.conn.Query(query, roomId)
 	if err != nil {
 		return nil, err
@@ -115,7 +140,7 @@ func (db *database) ListPosts(roomId string) ([]models.PostView, error) {
 	posts := []models.PostView{}
 	for rows.Next() {
 		var post models.PostView
-		err := rows.Scan(&post.Id, &post.Content, &post.Username, &post.CreatedAt)
+		err := rows.Scan(&post.Id, &post.Content, &post.Username, &post.CreatedAt, &post.RoomId)
 		if err != nil {
 			return nil, err
 		}
@@ -127,22 +152,24 @@ func (db *database) ListPosts(roomId string) ([]models.PostView, error) {
 }
 
 func (db *database) CreatePost(post models.Post) (models.PostView, error) {
-	query := `INSERT INTO posts (id, content, user_id, room_id) VALUES ($1, $2, $3, $4)`
-	_, err := db.conn.Exec(query, post.Id, post.Content, post.UserId, post.RoomId)
-	if err != nil {
+	postView := models.PostView{
+		Id:      post.Id,
+		Content: post.Content,
+		RoomId:  post.RoomId,
+	}
+
+	query := `INSERT INTO posts (id, content, user_id, room_id) VALUES ($1, $2, $3, $4) RETURNING created_at`
+	row := db.conn.QueryRow(query, post.Id, post.Content, post.UserId, post.RoomId)
+	if err := row.Scan(&postView.CreatedAt); err != nil {
 		// TODO handle conflict
 		return models.PostView{}, err
 	}
 
-	query = `SELECT posts.id, posts.content, users.username, posts.created_at FROM posts INNER JOIN users ON posts.user_id = users.id WHERE posts.id = $1`
-	row := db.conn.QueryRow(query, post.Id)
-
-	var postView models.PostView
-	err = row.Scan(&postView.Id, &postView.Content, &postView.Username, &postView.CreatedAt)
+	username, err := db.userGetName(post.UserId)
 	if err != nil {
-		// TODO handle not found
 		return models.PostView{}, err
 	}
 
+	postView.Username = username
 	return postView, nil
 }

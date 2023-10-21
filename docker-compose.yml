@@ -55,6 +55,8 @@ services:
     build: .
     command: [/goapp, bot]
     restart: always
+    # deploy:
+    #   replicas: 2
     environment:
       DATABASE_CONN_STRING: postgres://chatrooms:chatrooms@db:5432/chatrooms?sslmode=disable
       RABBITMQ_CONN_STRING: amqp://chatrooms:chatrooms@rabbitmq:5672/

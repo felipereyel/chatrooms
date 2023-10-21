@@ -2,7 +2,6 @@ package stockapi
 
 import (
 	"chatrooms/gosrc/utils"
-	"errors"
 	"fmt"
 )
 
@@ -31,7 +30,7 @@ func (s *stockApi) StockGet(code string) (StockResponse, error) {
 	}
 
 	if len(responses) == 0 {
-		return StockResponse{}, errors.New("no data found")
+		return StockResponse{}, ErrNoDataFound
 	}
 
 	return responses[0], nil

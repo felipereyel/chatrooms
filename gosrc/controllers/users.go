@@ -1,9 +1,11 @@
 package controllers
 
 import (
+	"chatrooms/gosrc/config"
 	"chatrooms/gosrc/models"
 	"chatrooms/gosrc/repositories/database"
 	"chatrooms/gosrc/utils"
+	"errors"
 
 	"github.com/google/uuid"
 )
@@ -22,6 +24,10 @@ type UserRequest struct {
 }
 
 func (tc *UserController) Login(req UserRequest) (string, error) {
+	if req.Username == config.Configs.BotUsername {
+		return "", errors.New("bot cannot login")
+	}
+
 	user, err := tc.dbRepo.UserLogin(req.Username, req.Password)
 	if err != nil {
 		return "", err
@@ -31,6 +37,10 @@ func (tc *UserController) Login(req UserRequest) (string, error) {
 }
 
 func (tc *UserController) Register(req UserRequest) (string, error) {
+	if req.Username == config.Configs.BotUsername {
+		return "", errors.New("bot cannot register")
+	}
+
 	hashedPassword, err := utils.HashPassword(req.Password)
 	if err != nil {
 		return "", err

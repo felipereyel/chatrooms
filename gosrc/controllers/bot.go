@@ -6,6 +6,7 @@ import (
 	"chatrooms/gosrc/repositories/broker"
 	"chatrooms/gosrc/repositories/database"
 	"chatrooms/gosrc/utils"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 
@@ -13,31 +14,37 @@ import (
 )
 
 type BotController struct {
+	botId      string
 	dbRepo     database.Database
 	brokerRepo broker.Broker
 }
 
-func NewBotController(dbRepo database.Database, brokerRepo broker.Broker) *BotController {
-	return &BotController{dbRepo, brokerRepo}
-}
-
-func (tc *BotController) EnsureAccount() error {
+func NewBotController(dbRepo database.Database, brokerRepo broker.Broker) (*BotController, error) {
 	hashedPassword, err := utils.HashPassword(config.Configs.BotPassword)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	user := models.User{
-		Id:       uuid.New().String(),
-		Username: config.Configs.BotUsername,
-		Pass:     hashedPassword,
+	var botId string
+	botId, err = dbRepo.UserGetId(config.Configs.BotUsername)
+	if err != nil {
+		if err != sql.ErrNoRows {
+			return nil, err
+		}
+
+		botId = uuid.New().String()
+		botUser := models.User{
+			Id:       botId,
+			Username: config.Configs.BotUsername,
+			Pass:     hashedPassword,
+		}
+
+		if err := dbRepo.UserRegister(botUser); err != nil {
+			return nil, err
+		}
 	}
 
-	if err = tc.dbRepo.UserUpsert(user); err != nil {
-		return err
-	}
-
-	return nil
+	return &BotController{botId, dbRepo, brokerRepo}, nil
 }
 
 func (bc *BotController) ListenAndAnswerCommands() error {
@@ -51,20 +58,25 @@ func (bc *BotController) ListenAndAnswerCommands() error {
 		body := msg.Body
 		var command models.CommandView
 		if err := json.Unmarshal(body, &command); err != nil {
-			// TODO handle bad message
+			// TODO handle bot errors
 			continue
 		}
 
-		response := models.PostView{
-			RoomId:    command.RoomId,
-			CreatedAt: utils.GetNow(),
-			Id:        uuid.New().String(),
-			Username:  config.Configs.BotUsername,
-			Content:   fmt.Sprintf("Answer for: %s", command.Payload),
+		post := models.Post{
+			Id:      uuid.New().String(),
+			UserId:  bc.botId,
+			RoomId:  command.RoomId,
+			Content: fmt.Sprintf("Answer for: %s", command.Payload),
 		}
 
-		if err := bc.brokerRepo.PublishPost(command.RoomId, response); err != nil {
-			// TODO handle bad message
+		postview, err := bc.dbRepo.CreatePost(post)
+		if err != nil {
+			// TODO handle bot errors
+			continue
+		}
+
+		if err := bc.brokerRepo.PublishPost(command.RoomId, postview); err != nil {
+			// TODO handle bot errors
 			continue
 		}
 

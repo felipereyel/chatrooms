@@ -61,7 +61,7 @@ export const getroom = async (id: string) => {
 };
 
 export const createroom = async (name: string) => {
-    const r = await fetch(`/_api/rooms`, {
+    const r = await fetch(`/_api/rooms/`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

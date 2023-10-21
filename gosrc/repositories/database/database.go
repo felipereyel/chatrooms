@@ -41,6 +41,20 @@ func (db *database) userGetName(userId string) (string, error) {
 	return username, nil
 }
 
+func (db *database) UserGetId(username string) (string, error) {
+	query := `SELECT id FROM users WHERE username = $1`
+	row := db.conn.QueryRow(query, username)
+
+	var userId string
+	err := row.Scan(&userId)
+	if err != nil {
+		// TODO handle not found
+		return "", err
+	}
+
+	return userId, nil
+}
+
 func (db *database) UserLogin(username string, password string) (models.User, error) {
 	query := `SELECT id, username, pass FROM users WHERE username = $1`
 	row := db.conn.QueryRow(query, username)
@@ -62,17 +76,6 @@ func (db *database) UserLogin(username string, password string) (models.User, er
 
 func (db *database) UserRegister(user models.User) error {
 	query := `INSERT INTO users (id, username, pass) VALUES ($1, $2, $3)`
-	_, err := db.conn.Exec(query, user.Id, user.Username, user.Pass)
-	if err != nil {
-		// TODO handle conflict
-		return err
-	}
-
-	return nil
-}
-
-func (db *database) UserUpsert(user models.User) error {
-	query := `INSERT INTO users (id, username, pass) VALUES ($1, $2, $3) ON CONFLICT (username) DO UPDATE SET pass = $3`
 	_, err := db.conn.Exec(query, user.Id, user.Username, user.Pass)
 	if err != nil {
 		// TODO handle conflict

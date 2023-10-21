@@ -21,8 +21,8 @@ func Run(cmd *cobra.Command, args []string) {
 	}
 	defer brokerRepo.Close()
 
-	bc := controllers.NewBotController(dbRepo, brokerRepo)
-	if err := bc.EnsureAccount(); err != nil {
+	bc, err := controllers.NewBotController(dbRepo, brokerRepo)
+	if err != nil {
 		panic(err.Error())
 	}
 

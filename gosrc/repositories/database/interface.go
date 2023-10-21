@@ -6,9 +6,9 @@ import "chatrooms/gosrc/models"
 type Database interface {
 	Close() error
 
+	UserGetId(username string) (string, error)
 	UserLogin(username string, password string) (models.User, error)
 	UserRegister(user models.User) error
-	UserUpsert(user models.User) error
 
 	ListRooms() ([]models.Room, error)
 	CreateRoom(room models.Room) error

@@ -69,7 +69,5 @@ func wsPosts(pc *controllers.PostsController) fiber.Handler {
 		if err != nil {
 			c.Close()
 		}
-
-		c.CloseHandler()
 	})
 }

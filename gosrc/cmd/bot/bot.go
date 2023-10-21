@@ -4,6 +4,7 @@ import (
 	"chatrooms/gosrc/controllers"
 	"chatrooms/gosrc/repositories/broker"
 	"chatrooms/gosrc/repositories/database"
+	"chatrooms/gosrc/repositories/stockapi"
 
 	"github.com/spf13/cobra"
 )
@@ -21,7 +22,9 @@ func Run(cmd *cobra.Command, args []string) {
 	}
 	defer brokerRepo.Close()
 
-	bc, err := controllers.NewBotController(dbRepo, brokerRepo)
+	stockApi := stockapi.NewStockApi()
+
+	bc, err := controllers.NewBotController(dbRepo, brokerRepo, stockApi)
 	if err != nil {
 		panic(err.Error())
 	}

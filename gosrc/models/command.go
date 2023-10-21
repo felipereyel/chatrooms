@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"regexp"
 )
 
@@ -14,12 +15,12 @@ func IsCommand(message string) bool {
 	return message[0] == '/'
 }
 
-// Payload: /stock=stock_code
-func (c *CommandView) IsValid() bool {
-	regex := regexp.MustCompile(`^\/stock=[a-zA-Z0-9.]+$`)
-	return regex.MatchString(c.Payload)
-}
+func (c *CommandView) GetStockCode() (string, error) {
+	regex := regexp.MustCompile(`^\/stock=([a-zA-Z0-9.]+)$`)
+	matches := regex.FindStringSubmatch(c.Payload)
+	if len(matches) != 2 {
+		return "", errors.New("invalid command")
+	}
 
-func (c *CommandView) FetchResponse() (string, error) {
-	return "Answer for: " + c.Payload, nil
+	return matches[1], nil
 }

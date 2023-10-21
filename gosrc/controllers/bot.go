@@ -5,6 +5,7 @@ import (
 	"chatrooms/gosrc/models"
 	"chatrooms/gosrc/repositories/broker"
 	"chatrooms/gosrc/repositories/database"
+	"chatrooms/gosrc/repositories/stockapi"
 	"chatrooms/gosrc/utils"
 	"database/sql"
 	"encoding/json"
@@ -17,9 +18,10 @@ type BotController struct {
 	botId      string
 	dbRepo     database.Database
 	brokerRepo broker.Broker
+	stockApi   stockapi.StockApi
 }
 
-func NewBotController(dbRepo database.Database, brokerRepo broker.Broker) (*BotController, error) {
+func NewBotController(dbRepo database.Database, brokerRepo broker.Broker, stockApi stockapi.StockApi) (*BotController, error) {
 	hashedPassword, err := utils.HashPassword(config.Configs.BotPassword)
 	if err != nil {
 		return nil, err
@@ -44,7 +46,7 @@ func NewBotController(dbRepo database.Database, brokerRepo broker.Broker) (*BotC
 		}
 	}
 
-	return &BotController{botId, dbRepo, brokerRepo}, nil
+	return &BotController{botId, dbRepo, brokerRepo, stockApi}, nil
 }
 
 func (bc *BotController) ListenAndAnswerCommands() error {
@@ -63,14 +65,19 @@ func (bc *BotController) ListenAndAnswerCommands() error {
 		}
 
 		var responseContent string
-
-		if !command.IsValid() {
+		code, err := command.GetStockCode()
+		if err != nil {
 			responseContent = "[Error] Invalid command"
 		} else {
-			responseContent, err = command.FetchResponse()
+			stockResponse, err := bc.stockApi.StockGet(code)
 			if err != nil {
 				responseContent = fmt.Sprintf("[Error] Processing failed: %s", err.Error())
+			} else if stockResponse.Open == "N/D" {
+				responseContent = fmt.Sprintf("%s quote is not available", stockResponse.Symbol)
+			} else {
+				responseContent = fmt.Sprintf("%s quote is $%s per share", stockResponse.Symbol, stockResponse.Open)
 			}
+
 		}
 
 		post := models.Post{

@@ -8,6 +8,12 @@ Use docker compose to run all required services:
     docker compose up
 ```
 
+The application should be runnig of port 3000 after initialization (fiber header will appear).   
+
+Note that this project uses `cookies` for authentication, so to simulate multiple users you can:    
+- open multiple different browsers 
+- combine the use of private/icognito windows with normal windows
+
 ## Contents
 This command will run the following containers:
 
@@ -25,13 +31,13 @@ This application was developed with scaling of its individual components in mind
   realtime messages to those subscribed to that rooms topic.
 
 - Command processing uses the `competing consumers` pattern. In this case there
-  thera may be multiple instances of bots running (for scaling purposes) and
+  may be multiple instances of bots running (for scaling purposes) and
   only one bot will respond to the command. The bots also have to acknowledge
   that the command was processed otherwise the message will return to the queue
   so other bots can process it. This ensures that if a bot goes down for any
   reason the message will not be lost.
 
-## Testing
+## Unit Testing
 
 Tests were written for the controllers, utils and modes. Run them with:
 

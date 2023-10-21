@@ -21,12 +21,12 @@
 
 <script setup lang="ts">
 import { nextTick, onMounted, reactive } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { onBeforeRouteLeave, useRoute } from 'vue-router';
 import { getroom, listposts, createpost, getRoomWs } from '../api';
 
 const route = useRoute();
-const router = useRouter();
 const roomId = route.params.id as string;
+let ws: WebSocket;
 
 type Posts = {
   id: string;
@@ -55,7 +55,7 @@ onMounted(async () => {
     posts.push(...lposts.reverse());
     elem.scrollTop = elem.scrollHeight;
 
-    const ws = getRoomWs(roomId);
+    ws = getRoomWs(roomId);
     ws.addEventListener('message', (event) => {
       posts.push(JSON.parse(event.data));
       if (posts.length > 50) {
@@ -72,6 +72,8 @@ onMounted(async () => {
     // router.push('/');
   }
 });
+
+onBeforeRouteLeave(() => ws.close());
 
 const sendMessage = async () => {
   const { message } = state;

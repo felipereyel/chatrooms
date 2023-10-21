@@ -9,7 +9,7 @@ type stockApi struct {
 	client utils.HTTPClient
 }
 
-func NewStockApi() *stockApi {
+func NewStockApi() StockApi {
 	client := utils.HTTPClient{
 		BaseUrl: "https://stooq.com",
 	}

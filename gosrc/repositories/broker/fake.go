@@ -12,7 +12,7 @@ type fakeBroker struct {
 	commandsChan chan amqp.Delivery
 }
 
-func FakeBrokerRepo() (*fakeBroker, error) {
+func FakeBrokerRepo() (Broker, error) {
 	postsChan := make(map[string]chan amqp.Delivery)
 	commandsChan := make(chan amqp.Delivery)
 

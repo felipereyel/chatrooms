@@ -18,7 +18,7 @@ type broker struct {
 const postsExchangeName = "chatrooms:posts"
 const commandsQueueName = "chatrooms:commands"
 
-func NewBrokerRepo() (*broker, error) {
+func NewBrokerRepo() (Broker, error) {
 	if config.Configs.RabbitMQConnString == "" {
 		return nil, errors.New("RabbitMQConnString is not set")
 	}

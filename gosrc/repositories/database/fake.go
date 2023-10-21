@@ -14,7 +14,7 @@ type fakeDatabase struct {
 	posts map[string]models.Post
 }
 
-func FakeDatabaseRepo() (*fakeDatabase, error) {
+func FakeDatabaseRepo() (Database, error) {
 	users := make(map[string]models.User)
 	rooms := make(map[string]models.Room)
 	posts := make(map[string]models.Post)

@@ -14,7 +14,7 @@ type database struct {
 	conn *sql.DB
 }
 
-func NewDatabaseRepo() (*database, error) {
+func NewDatabaseRepo() (Database, error) {
 	if config.Configs.DatabaseConnString == "" {
 		return nil, errors.New("DatabaseConnString is not set")
 	}

@@ -2,7 +2,7 @@ package stockapi
 
 type fakeStockApi struct{}
 
-func FakeStockApi() *fakeStockApi {
+func FakeStockApi() StockApi {
 	return &fakeStockApi{}
 }
 

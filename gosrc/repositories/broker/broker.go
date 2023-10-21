@@ -5,7 +5,6 @@ import (
 	"chatrooms/gosrc/models"
 	"context"
 	"encoding/json"
-	"fmt"
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -147,8 +146,6 @@ func (b *broker) PublishCommand(command models.CommandView) error {
 	if err != nil {
 		return err
 	}
-
-	fmt.Println(string(body))
 
 	ch, err := b.conn.Channel()
 	if err != nil {

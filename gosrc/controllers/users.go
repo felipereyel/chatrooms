@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"chatrooms/gosrc/config"
 	"chatrooms/gosrc/models"
 	"chatrooms/gosrc/repositories/database"
 	"chatrooms/gosrc/utils"
@@ -15,12 +14,8 @@ type UserController struct {
 	botUsername string
 }
 
-func NewUserController(dbRepo database.Database) (*UserController, error) {
-	if config.Configs.BotUsername == "" {
-		return nil, errors.New("BotUsername is not set")
-	}
-
-	return &UserController{dbRepo, config.Configs.BotUsername}, nil
+func NewUserController(dbRepo database.Database, botUsername string) *UserController {
+	return &UserController{dbRepo, botUsername}
 }
 
 type UserRequest struct {

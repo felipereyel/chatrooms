@@ -14,12 +14,12 @@ type fakeDatabase struct {
 	posts map[string]models.Post
 }
 
-func FakeDatabaseRepo() (Database, error) {
+func FakeDatabaseRepo() Database {
 	users := make(map[string]models.User)
 	rooms := make(map[string]models.Room)
 	posts := make(map[string]models.Post)
 
-	return &fakeDatabase{users, rooms, posts}, nil
+	return &fakeDatabase{users, rooms, posts}
 }
 
 func (db *fakeDatabase) Close() error {
@@ -64,6 +64,12 @@ func (db *fakeDatabase) UserLogin(username string, password string) (models.User
 }
 
 func (db *fakeDatabase) UserRegister(user models.User) error {
+	for _, u := range db.users {
+		if u.Username == user.Username {
+			return errors.New("username already exists")
+		}
+	}
+
 	db.users[user.Id] = user
 	return nil
 }

@@ -14,6 +14,9 @@ func Init(app *fiber.App) error {
 	if config.Configs.JWTSecret == "" {
 		return fmt.Errorf("[Init] JWTSecret is not set")
 	}
+	if config.Configs.BotUsername == "" {
+		return fmt.Errorf("[Init] BotUsername is not set")
+	}
 
 	database, err := database.NewDatabaseRepo()
 	if err != nil {
@@ -27,10 +30,7 @@ func Init(app *fiber.App) error {
 
 	apiGroup := app.Group("/_api")
 
-	uc, err := controllers.NewUserController(database)
-	if err != nil {
-		return fmt.Errorf("[Init] failed to get user controller: %w", err)
-	}
+	uc := controllers.NewUserController(database, config.Configs.BotUsername)
 	usersGroup := apiGroup.Group("/users")
 	initUsersRoutes(usersGroup, uc)
 

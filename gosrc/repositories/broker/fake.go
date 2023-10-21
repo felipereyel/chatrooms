@@ -12,11 +12,11 @@ type fakeBroker struct {
 	commandsChan chan amqp.Delivery
 }
 
-func FakeBrokerRepo() (Broker, error) {
+func FakeBrokerRepo() Broker {
 	postsChan := make(map[string]chan amqp.Delivery)
 	commandsChan := make(chan amqp.Delivery)
 
-	return &fakeBroker{postsChan, commandsChan}, nil
+	return &fakeBroker{postsChan, commandsChan}
 }
 
 func (b *fakeBroker) Close() error {

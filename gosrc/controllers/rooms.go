@@ -8,7 +8,7 @@ import (
 )
 
 type RoomController struct {
-	DbRepo database.Database
+	dbRepo database.Database
 }
 
 func NewRoomController(dbRepo database.Database) *RoomController {
@@ -16,7 +16,7 @@ func NewRoomController(dbRepo database.Database) *RoomController {
 }
 
 func (tc *RoomController) ListRooms() ([]models.Room, error) {
-	rooms, err := tc.DbRepo.ListRooms()
+	rooms, err := tc.dbRepo.ListRooms()
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +30,7 @@ func (tc *RoomController) CreateRoom(name string) (models.Room, error) {
 		Name: name,
 	}
 
-	err := tc.DbRepo.CreateRoom(room)
+	err := tc.dbRepo.CreateRoom(room)
 	if err != nil {
 		return models.Room{}, err
 	}
@@ -39,7 +39,7 @@ func (tc *RoomController) CreateRoom(name string) (models.Room, error) {
 }
 
 func (tc *RoomController) GetRoom(roomId string) (models.Room, error) {
-	room, err := tc.DbRepo.GetRoom(roomId)
+	room, err := tc.dbRepo.GetRoom(roomId)
 	if err != nil {
 		return models.Room{}, err
 	}

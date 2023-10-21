@@ -9,16 +9,16 @@ import (
 )
 
 type PostsController struct {
-	DbRepo     database.Database
-	BrokerRepo broker.Broker
+	dbRepo     database.Database
+	brokerRepo broker.Broker
 }
 
 func NewPostsController(dbRepo database.Database, brokerRepo broker.Broker) *PostsController {
 	return &PostsController{dbRepo, brokerRepo}
 }
 
-func (tc *PostsController) ListPosts(roomId string) ([]models.PostView, error) {
-	posts, err := tc.DbRepo.ListPosts(roomId)
+func (pc *PostsController) ListPosts(roomId string) ([]models.PostView, error) {
+	posts, err := pc.dbRepo.ListPosts(roomId)
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +26,7 @@ func (tc *PostsController) ListPosts(roomId string) ([]models.PostView, error) {
 	return posts, nil
 }
 
-func (tc *PostsController) CreatePost(userId, roomId, content string) error {
+func (pc *PostsController) CreatePost(userId, roomId, content string) error {
 	post := models.Post{
 		Id:      uuid.New().String(),
 		UserId:  userId,
@@ -34,10 +34,29 @@ func (tc *PostsController) CreatePost(userId, roomId, content string) error {
 		Content: content,
 	}
 
-	postview, err := tc.DbRepo.CreatePost(post)
+	postview, err := pc.dbRepo.CreatePost(post)
 	if err != nil {
 		return err
 	}
 
-	return tc.BrokerRepo.Publish(roomId, postview)
+	return pc.brokerRepo.Publish(roomId, postview)
+}
+
+type MessageWriter func(data []byte) error
+
+func (pc *PostsController) SubscribeMessages(roomId string, writer MessageWriter) error {
+	subscription, err := pc.brokerRepo.Subscribe(roomId)
+	if err != nil {
+		return err
+	}
+	defer subscription.Close()
+
+	for msg := range subscription.MessageChan {
+		body := msg.Body
+		if err := writer(body); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

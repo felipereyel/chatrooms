@@ -9,7 +9,7 @@ import (
 )
 
 type UserController struct {
-	DbRepo database.Database
+	dbRepo database.Database
 }
 
 func NewUserController(dbRepo database.Database) *UserController {
@@ -22,7 +22,7 @@ type UserRequest struct {
 }
 
 func (tc *UserController) Login(req UserRequest) (string, error) {
-	user, err := tc.DbRepo.UserLogin(req.Username, req.Password)
+	user, err := tc.dbRepo.UserLogin(req.Username, req.Password)
 	if err != nil {
 		return "", err
 	}
@@ -42,7 +42,7 @@ func (tc *UserController) Register(req UserRequest) (string, error) {
 		Pass:     hashedPassword,
 	}
 
-	err = tc.DbRepo.UserRegister(user)
+	err = tc.dbRepo.UserRegister(user)
 	if err != nil {
 		return "", err
 	}

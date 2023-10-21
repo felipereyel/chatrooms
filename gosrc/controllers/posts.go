@@ -51,7 +51,7 @@ func (pc *PostsController) SubscribeMessages(roomId string, writer MessageWriter
 	}
 	defer subscription.Close()
 
-	for msg := range subscription.MessageChan {
+	for msg := range subscription.Channel() {
 		body := msg.Body
 		if err := writer(body); err != nil {
 			return err

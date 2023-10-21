@@ -22,7 +22,7 @@ func Tap(cmd *cobra.Command, args []string) {
 	}
 	defer subscription.Close()
 
-	for msg := range subscription.MessageChan {
+	for msg := range subscription.Channel() {
 		body := msg.Body
 		var post models.PostView
 		if err := json.Unmarshal(body, &post); err != nil {

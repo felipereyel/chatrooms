@@ -78,11 +78,20 @@ func (b *broker) Publish(roomId string, post models.PostView) error {
 	)
 }
 
-func (c *subscription) Close() error {
+type rabitSubscription struct {
+	brokerChannel *amqp.Channel
+	MessageChan   <-chan amqp.Delivery
+}
+
+func (c rabitSubscription) Close() error {
 	return c.brokerChannel.Close()
 }
 
-func (b *broker) Subscribe(roomId string) (*subscription, error) {
+func (c rabitSubscription) Channel() <-chan amqp.Delivery {
+	return c.MessageChan
+}
+
+func (b *broker) Subscribe(roomId string) (subscription, error) {
 	ch, err := b.conn.Channel()
 	if err != nil {
 		return nil, err
@@ -137,5 +146,5 @@ func (b *broker) Subscribe(roomId string) (*subscription, error) {
 		return nil, err
 	}
 
-	return &subscription{ch, msgs}, nil
+	return &rabitSubscription{ch, msgs}, nil
 }

@@ -44,6 +44,6 @@ Tests were written for the controllers, utils and modes. Run them with:
 ```sh
   go test ./... -v
 ```
-
+This tests also run on a github action [workflow](./.github/workflows/test.yml).   
 Note that the tests for the user controller take about 4 seconds.   
 That is a feature of `bcrypt` to prevent brute forcing passwords.

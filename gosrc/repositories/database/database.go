@@ -15,6 +15,10 @@ type database struct {
 }
 
 func NewDatabaseRepo() (*database, error) {
+	if config.Configs.DatabaseConnString == "" {
+		return nil, errors.New("DatabaseConnString is not set")
+	}
+
 	conn, err := sql.Open("postgres", config.Configs.DatabaseConnString)
 	if err != nil {
 		return nil, err

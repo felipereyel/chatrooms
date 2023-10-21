@@ -22,6 +22,10 @@ type BotController struct {
 }
 
 func NewBotController(dbRepo database.Database, brokerRepo broker.Broker, stockApi stockapi.StockApi) (*BotController, error) {
+	if config.Configs.BotUsername == "" || config.Configs.BotPassword == "" {
+		return nil, fmt.Errorf("BotUsername and BotPassword must be set")
+	}
+
 	hashedPassword, err := utils.HashPassword(config.Configs.BotPassword)
 	if err != nil {
 		return nil, err

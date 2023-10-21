@@ -5,6 +5,7 @@ import (
 	"chatrooms/gosrc/models"
 	"context"
 	"encoding/json"
+	"errors"
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -18,6 +19,10 @@ const postsExchangeName = "chatrooms:posts"
 const commandsQueueName = "chatrooms:commands"
 
 func NewBrokerRepo() (*broker, error) {
+	if config.Configs.RabbitMQConnString == "" {
+		return nil, errors.New("RabbitMQConnString is not set")
+	}
+
 	conn, err := amqp.Dial(config.Configs.RabbitMQConnString)
 	if err != nil {
 		return nil, err

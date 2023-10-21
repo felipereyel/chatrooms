@@ -11,11 +11,16 @@ import (
 )
 
 type UserController struct {
-	dbRepo database.Database
+	dbRepo      database.Database
+	botUsername string
 }
 
-func NewUserController(dbRepo database.Database) *UserController {
-	return &UserController{dbRepo}
+func NewUserController(dbRepo database.Database) (*UserController, error) {
+	if config.Configs.BotUsername == "" {
+		return nil, errors.New("BotUsername is not set")
+	}
+
+	return &UserController{dbRepo, config.Configs.BotUsername}, nil
 }
 
 type UserRequest struct {
@@ -24,7 +29,7 @@ type UserRequest struct {
 }
 
 func (tc *UserController) Login(req UserRequest) (string, error) {
-	if req.Username == config.Configs.BotUsername {
+	if req.Username == tc.botUsername {
 		return "", errors.New("bot cannot login")
 	}
 
@@ -37,7 +42,7 @@ func (tc *UserController) Login(req UserRequest) (string, error) {
 }
 
 func (tc *UserController) Register(req UserRequest) (string, error) {
-	if req.Username == config.Configs.BotUsername {
+	if req.Username == tc.botUsername {
 		return "", errors.New("bot cannot register")
 	}
 

@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"chatrooms/gosrc/config"
 	"chatrooms/gosrc/controllers"
 	"chatrooms/gosrc/repositories/broker"
 	"chatrooms/gosrc/repositories/database"
@@ -10,6 +11,10 @@ import (
 )
 
 func Init(app *fiber.App) error {
+	if config.Configs.JWTSecret == "" {
+		return fmt.Errorf("[Init] JWTSecret is not set")
+	}
+
 	database, err := database.NewDatabaseRepo()
 	if err != nil {
 		return fmt.Errorf("[Init] failed to get database: %w", err)
@@ -22,7 +27,10 @@ func Init(app *fiber.App) error {
 
 	apiGroup := app.Group("/_api")
 
-	uc := controllers.NewUserController(database)
+	uc, err := controllers.NewUserController(database)
+	if err != nil {
+		return fmt.Errorf("[Init] failed to get user controller: %w", err)
+	}
 	usersGroup := apiGroup.Group("/users")
 	initUsersRoutes(usersGroup, uc)
 

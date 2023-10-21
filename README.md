@@ -30,3 +30,14 @@ This application was developed with scaling of its individual components in mind
   that the command was processed otherwise the message will return to the queue
   so other bots can process it. This ensures that if a bot goes down for any
   reason the message will not be lost.
+
+## Testing
+
+Tests were written for the controllers. Run them with:
+
+```sh
+  go test ./gosrc/controllers -v
+```
+
+Note that the tests for the user controller take about 4 seconds.   
+That is a feature of `bcrypt` to prevent brute forcing passwords.

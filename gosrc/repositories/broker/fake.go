@@ -10,13 +10,14 @@ import (
 type fakeBroker struct {
 	postsChan    map[string]chan amqp.Delivery
 	commandsChan chan amqp.Delivery
+	queueSize    int
 }
 
-func FakeBrokerRepo() Broker {
+func FakeBrokerRepo(queueSize int) Broker {
 	postsChan := make(map[string]chan amqp.Delivery)
-	commandsChan := make(chan amqp.Delivery)
+	commandsChan := make(chan amqp.Delivery, queueSize)
 
-	return &fakeBroker{postsChan, commandsChan}
+	return &fakeBroker{postsChan, commandsChan, queueSize}
 }
 
 func (b *fakeBroker) Close() error {
@@ -35,7 +36,7 @@ func (b *fakeBroker) PublishPost(roomId string, post models.PostView) error {
 
 	ch, ok := b.postsChan[roomId]
 	if !ok {
-		ch = make(chan amqp.Delivery)
+		ch = make(chan amqp.Delivery, b.queueSize)
 		b.postsChan[roomId] = ch
 	}
 

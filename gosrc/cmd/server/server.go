@@ -17,11 +17,14 @@ func Start(cmd *cobra.Command, args []string) {
 
 	app := fiber.New(fiber.Config{
 		ErrorHandler:  routes.ErrorHandler,
-		StrictRouting: true,
+		StrictRouting: false,
 	})
 
 	app.Use(cors.New())
-	routes.Init(app)
+
+	if err := routes.Init(app); err != nil {
+		panic(err.Error())
+	}
 
 	if err := app.Listen(config.Configs.ServerAddress); err != nil {
 		panic(err.Error())

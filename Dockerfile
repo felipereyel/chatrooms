@@ -26,6 +26,8 @@ WORKDIR /app
 
 COPY --from=goapp /app/goapp /goapp
 COPY --from=vueapp /app/dist /dist
+COPY migrations/ ./migrations
 
 ENV PUBLIC_DIR /dist
+ENV MIGRATIONS_DIR migrations
 CMD ["/goapp", "serve"]

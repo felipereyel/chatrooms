@@ -34,6 +34,5 @@ func Init(app *fiber.App) error {
 	postsGroup := apiGroup.Group("/rooms")
 	initPostsRoutes(postsGroup, pc)
 
-	initStaticRoutes(app)
-	return nil
+	return initStaticRoutes(app)
 }

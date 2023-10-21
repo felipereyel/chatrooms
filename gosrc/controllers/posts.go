@@ -17,7 +17,7 @@ func NewPostsController(dbRepo database.Database, brokerRepo broker.Broker) *Pos
 	return &PostsController{dbRepo, brokerRepo}
 }
 
-func (pc *PostsController) CreateCommand(roomId, payload string) error {
+func (pc *PostsController) createCommand(roomId, payload string) error {
 	commandView := models.CommandView{
 		Id:      uuid.New().String(),
 		Payload: payload,
@@ -38,7 +38,7 @@ func (pc *PostsController) ListPosts(roomId string) ([]models.PostView, error) {
 
 func (pc *PostsController) CreatePost(userId, roomId, content string) error {
 	if models.IsCommand(content) {
-		return pc.CreateCommand(roomId, content)
+		return pc.createCommand(roomId, content)
 	}
 
 	post := models.Post{

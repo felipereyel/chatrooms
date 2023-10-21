@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"chatrooms/gosrc/config"
 	"chatrooms/gosrc/models"
 	"chatrooms/gosrc/repositories/broker"
 	"chatrooms/gosrc/repositories/database"
@@ -21,18 +20,14 @@ type BotController struct {
 	stockApi   stockapi.StockApi
 }
 
-func NewBotController(dbRepo database.Database, brokerRepo broker.Broker, stockApi stockapi.StockApi) (*BotController, error) {
-	if config.Configs.BotUsername == "" || config.Configs.BotPassword == "" {
-		return nil, fmt.Errorf("BotUsername and BotPassword must be set")
-	}
-
-	hashedPassword, err := utils.HashPassword(config.Configs.BotPassword)
+func NewBotController(dbRepo database.Database, brokerRepo broker.Broker, stockApi stockapi.StockApi, botUsername, botPassword string) (*BotController, error) {
+	hashedPassword, err := utils.HashPassword(botPassword)
 	if err != nil {
 		return nil, err
 	}
 
 	var botId string
-	botId, err = dbRepo.UserGetId(config.Configs.BotUsername)
+	botId, err = dbRepo.UserGetId(botUsername)
 	if err != nil {
 		if err != sql.ErrNoRows {
 			return nil, err
@@ -41,7 +36,7 @@ func NewBotController(dbRepo database.Database, brokerRepo broker.Broker, stockA
 		botId = uuid.New().String()
 		botUser := models.User{
 			Id:       botId,
-			Username: config.Configs.BotUsername,
+			Username: botUsername,
 			Pass:     hashedPassword,
 		}
 

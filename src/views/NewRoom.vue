@@ -1,8 +1,9 @@
 <template>
-  <div class="flex items-end">
-    <router-link class="text-3xl" to="/">Rooms</router-link>
-    <h1 class="text-3xl">: New Room</h1>
-  </div>
+  <Header>
+    <template #left>
+      <h1 class="text-3xl">: New Room</h1>
+    </template>
+  </Header>
   <div class="flex-1 flex align-center justify-center space-y-2 p-8">
     <div class="flex flex-col align-center w-80">
       <input type="text" placeholder="room name" v-model="state.name" class="mb-2 text-black" />
@@ -17,6 +18,7 @@
 import { reactive } from 'vue';
 import { createroom } from '../api';
 import { useRouter } from 'vue-router';
+import Header from '../components/Header.vue';
 
 const router = useRouter();
 

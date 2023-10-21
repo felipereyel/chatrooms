@@ -31,7 +31,12 @@ func saveAuth(c *fiber.Ctx) error {
 		return fiber.ErrUnauthorized
 	}
 
-	jwt, exp, err := utils.GenerateJWT(id)
+	username, ok := c.Locals("username").(string)
+	if !ok {
+		return fiber.ErrUnauthorized
+	}
+
+	jwt, exp, err := utils.GenerateJWT(id, username)
 	if err != nil {
 		return err
 	}

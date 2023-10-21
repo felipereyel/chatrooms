@@ -1,8 +1,9 @@
 <template>
-  <div class="flex items-end">
-    <router-link class="text-3xl" to="/">Rooms</router-link>
-    <h1 class="text-3xl">&#20; > {{ state.roomName }}</h1>
-  </div>
+  <Header class="flex justify-between">
+    <template #left>
+      <h1 class="text-3xl">&#20; > {{ state.roomName }}</h1>
+    </template>
+  </Header>
   <div class="flex-1 flex flex-col overflow-y-auto space-y-2 p-8">
     <div class="flex-1 overflow-y-auto space-y-2" id="msg-container">
       <div v-for="message in posts" :key="message.id" class="flex items-center bg-slate-600 rounded-md px-2 justify-between">
@@ -20,9 +21,11 @@
 </template>
 
 <script setup lang="ts">
+import Header from '../components/Header.vue';
 import { nextTick, onMounted, reactive } from 'vue';
 import { onBeforeRouteLeave, useRoute } from 'vue-router';
 import { getroom, listposts, createpost, getRoomWs } from '../api';
+
 
 const route = useRoute();
 const roomId = route.params.id as string;

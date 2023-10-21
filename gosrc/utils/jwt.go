@@ -7,7 +7,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func GenerateJWT(id string) (string, time.Time, error) {
+func GenerateJWT(id, username string) (string, time.Time, error) {
 	secret := config.Configs.JWTSecret
 
 	expiration := time.Now().Add(7 * 24 * time.Hour)
@@ -16,6 +16,7 @@ func GenerateJWT(id string) (string, time.Time, error) {
 		ID:        id,
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
 		ExpiresAt: jwt.NewNumericDate(expiration),
+		Subject:   username,
 	}
 
 	jwtoken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

@@ -26,6 +26,7 @@ func userLogin(tc *controllers.UserController) fiber.Handler {
 			return err
 		}
 
+		c.Locals("username", req.Username)
 		c.Locals("id", id)
 		return c.Next()
 	}
@@ -46,6 +47,7 @@ func userRegister(tc *controllers.UserController) fiber.Handler {
 			return err
 		}
 
+		c.Locals("username", req.Username)
 		c.Locals("id", id)
 		return c.Next()
 	}

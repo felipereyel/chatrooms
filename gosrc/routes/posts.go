@@ -62,12 +62,23 @@ func wsPosts(pc *controllers.PostsController) fiber.Handler {
 	return websocket.New(func(c *websocket.Conn) {
 		roomId := c.Params("roomId")
 
-		err := pc.SubscribeMessages(roomId, func(data []byte) error {
-			return c.WriteMessage(websocket.TextMessage, data)
-		})
-
+		subs, err := pc.SubscribePosts(roomId)
 		if err != nil {
 			c.Close()
+			return
+		}
+		defer subs.Close()
+
+		c.SetCloseHandler(func(code int, text string) error {
+			return subs.Close()
+		})
+
+		for msg := range subs.Channel() {
+			body := msg.Body
+			if err := c.WriteMessage(websocket.TextMessage, body); err != nil {
+				c.Close()
+				return
+			}
 		}
 	})
 }

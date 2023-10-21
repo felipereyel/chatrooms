@@ -55,7 +55,7 @@ func (c fakeSubscription) Channel() <-chan amqp.Delivery {
 	return c.channel
 }
 
-func (b *fakeBroker) SubscribePosts(roomId string) (postsSubscription, error) {
+func (b *fakeBroker) SubscribePosts(roomId string) (PostsSubscription, error) {
 	ch, ok := b.postsChan[roomId]
 	if !ok {
 		ch = make(chan amqp.Delivery)
@@ -87,6 +87,6 @@ func (c fakeConsumer) Channel() <-chan amqp.Delivery {
 	return c.channel
 }
 
-func (b *fakeBroker) ConsumeCommands() (commandsConsumer, error) {
+func (b *fakeBroker) ConsumeCommands() (CommandsConsumer, error) {
 	return &fakeConsumer{b.commandsChan}, nil
 }

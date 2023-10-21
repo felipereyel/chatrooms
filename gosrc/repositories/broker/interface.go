@@ -6,12 +6,12 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-type postsSubscription interface {
+type PostsSubscription interface {
 	Close() error
 	Channel() <-chan amqp.Delivery
 }
 
-type commandsConsumer interface {
+type CommandsConsumer interface {
 	Close() error
 	Channel() <-chan amqp.Delivery
 }
@@ -20,8 +20,8 @@ type Broker interface {
 	Close() error
 
 	PublishPost(roomId string, post models.PostView) error
-	SubscribePosts(roomId string) (postsSubscription, error)
+	SubscribePosts(roomId string) (PostsSubscription, error)
 
 	PublishCommand(command models.CommandView) error
-	ConsumeCommands() (commandsConsumer, error)
+	ConsumeCommands() (CommandsConsumer, error)
 }

@@ -56,21 +56,6 @@ func (pc *PostsController) CreatePost(userId, roomId, content string) error {
 	return pc.brokerRepo.PublishPost(roomId, postview)
 }
 
-type MessageWriter func(data []byte) error
-
-func (pc *PostsController) SubscribeMessages(roomId string, writer MessageWriter) error {
-	subscription, err := pc.brokerRepo.SubscribePosts(roomId)
-	if err != nil {
-		return err
-	}
-	defer subscription.Close()
-
-	for msg := range subscription.Channel() {
-		body := msg.Body
-		if err := writer(body); err != nil {
-			return err
-		}
-	}
-
-	return nil
+func (pc *PostsController) SubscribePosts(roomId string) (broker.PostsSubscription, error) {
+	return pc.brokerRepo.SubscribePosts(roomId)
 }

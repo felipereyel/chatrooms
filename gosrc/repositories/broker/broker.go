@@ -88,7 +88,7 @@ func (c rabitSubscription) Channel() <-chan amqp.Delivery {
 	return c.MessageChan
 }
 
-func (b *broker) SubscribePosts(roomId string) (postsSubscription, error) {
+func (b *broker) SubscribePosts(roomId string) (PostsSubscription, error) {
 	ch, err := b.conn.Channel()
 	if err != nil {
 		return nil, err
@@ -204,7 +204,7 @@ func (c rabitConsumer) Channel() <-chan amqp.Delivery {
 	return c.MessageChan
 }
 
-func (b *broker) ConsumeCommands() (commandsConsumer, error) {
+func (b *broker) ConsumeCommands() (CommandsConsumer, error) {
 	ch, err := b.conn.Channel()
 	if err != nil {
 		return nil, err
